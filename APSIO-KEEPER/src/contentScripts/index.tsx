@@ -6,6 +6,7 @@ import browser from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
 import LocalMessageDuplexStream from 'post-message-stream';
 import pump from 'pump';
+import PortStream from 'extension-port-stream';
 
 //The content to inject into the page
 const inpageContent = "";
