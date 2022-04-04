@@ -8,11 +8,11 @@ import LocalMessageDuplexStream from 'post-message-stream';
 import pump from 'pump';
 import PortStream from 'extension-port-stream';
 
-//The content to inject into the page
-const inpageContent = "";
-//Récupère la source url de l'inpage 
-const inpageSuffix = `//# sourceURL=${browser.runtime.getURL('inpage.js')}\n`;
-const inpageBundle = inpageContent + inpageSuffix;
+// //The content to inject into the page
+// const inpageContent = "";
+// //Récupère la source url de l'inpage 
+// const inpageSuffix = `//# sourceURL=${browser.runtime.getURL('inpage.js')}\n`;
+// const inpageBundle = inpageContent + inpageSuffix;
 
 /**
  * Regarde si le type du document est valide 
@@ -61,14 +61,17 @@ function shouldInject() {
  */
 function injectScript() {
   try{
+    console.log("coucou");
+
     const container = document.head || document.documentElement;
     const scriptTag = document.createElement('script');
     scriptTag.setAttribute('async', 'false');
-    scriptTag.src = browser.runtime.getURL('dist/inpage.js');
+    //scriptTag.src = browser.runtime.getURL('dist/inpage.js');
+    scriptTag.innerHTML = "ApsioKeeper = {}";
     container.insertBefore(scriptTag, container.children[0]);
-    scriptTag.onload = () => {
-      container.removeChild(scriptTag);
-    }
+    // scriptTag.onload = () => {
+    //   container.removeChild(scriptTag);
+    // }
   }catch(error){
     console.error("Erreur lors de la tentative d'injection. ", error);
   }
@@ -85,11 +88,11 @@ async function setupStreams() {
       target: 'apsio_keeper_page',
     });
 
-    const pluginPort = browser.runtime.connect({ name: 'contentscript' });
-    const pluginStream = new PortStream(pluginPort);
+    //const pluginPort = browser.runtime.connect({ name: 'contentscript' });
+    //const pluginStream = new PortStream(pluginPort);
 
-    pump(pageStream, pluginStream, pageStream, err => 
-      console.log(err));
+    // pump(pageStream, pluginStream, pageStream, err => 
+    //   console.log(err));
 }
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value

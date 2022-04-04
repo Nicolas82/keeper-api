@@ -34,7 +34,7 @@
     "@types/webextension-polyfill": "^0.8.0",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^5.2.0",
-    "@vitejs/plugin-react": "^1.0.6",
+    "@vitejs/plugin-react": "1.0.5",
     "chokidar": "^3.5.2",
     "cross-env": "^7.0.3",
     "crx": "^5.0.1",
@@ -58,6 +58,7 @@
     "web-ext": "^6.4.0"
   },
   "dependencies": {
+    "@metamask/post-message-stream": "^4.0.0",
     "@metamask/providers": "^8.1.1",
     "dnode": "^1.2.2",
     "extension-port-stream": "^2.0.1",

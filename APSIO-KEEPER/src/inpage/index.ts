@@ -1,5 +1,6 @@
 
 import LocalMessageDuplexStream from 'post-message-stream';
+//@ts-ignore
 import { setupDnode, transformMethods, cbToPromise } from '../lib/dnode-util';
 import EventEmitter from 'events';
 
