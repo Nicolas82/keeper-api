@@ -1,6 +1,10 @@
 import { sendMessage } from "webext-bridge";
 import { Tabs } from "webextension-polyfill";
 import browser from "webextension-polyfill";
+import pump from "pump";
+import EventEmitter from "events";
+import PortStream from 'extension-port-stream';
+import { setupDnode } from '../lib/dnode-util';
 
 // only on dev mode
 if (import.meta.hot) {
@@ -10,9 +14,15 @@ if (import.meta.hot) {
   import("./contentScriptHMR");
 }
 
-browser.runtime.onInstalled.addListener((): void => {
+const bgPromise: Promise<any> = setupBackgroundService();
+
+function setupBackgroundService() : Promise<any>{
+  return 0;
+}
+
+browser.runtime.onInstalled.addListener(async details => {
   // eslint-disable-next-line no-console
-  console.log("Extension installed");
+  const bgService = await bgPromise;
 });
 
 let previousTabId = 0;
@@ -28,7 +38,7 @@ browser.runtime.onConnect.addListener(() => {
  * @param remotePort Le port donné 
  */
 function connectRemote(remotePort: any){
-  
+
 }
 
 //Est exécuté lors de la première installation
@@ -61,3 +71,20 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
     { context: "content-script", tabId }
   );
 });
+
+class BackgroundService extends EventEmitter {
+
+  constructor(options = Object()){
+    super();
+  }
+
+  //L'api qui va être injecté dans la page web
+  getInpageApi(origin: any) {
+
+    return {
+      
+    }
+
+  }
+
+}
