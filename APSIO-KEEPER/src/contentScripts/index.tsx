@@ -4,15 +4,9 @@ import ReactDOM from "react-dom";
 import { onMessage } from "webext-bridge";
 import browser from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
-import LocalMessageDuplexStream from 'post-message-stream';
+//import LocalMessageDuplexStream from 'post-message-stream';
 import pump from 'pump';
 import PortStream from 'extension-port-stream';
-
-// //The content to inject into the page
-// const inpageContent = "";
-// //Récupère la source url de l'inpage 
-// const inpageSuffix = `//# sourceURL=${browser.runtime.getURL('inpage.js')}\n`;
-// const inpageBundle = inpageContent + inpageSuffix;
 
 /**
  * Regarde si le type du document est valide 
@@ -61,13 +55,13 @@ function shouldInject() {
  */
 function injectScript() {
   try{
-    console.log("coucou");
 
     const container = document.head || document.documentElement;
     const scriptTag = document.createElement('script');
+
     scriptTag.setAttribute('async', 'false');
-    //scriptTag.src = browser.runtime.getURL('dist/inpage.js');
-    scriptTag.innerHTML = "ApsioKeeper = {}";
+    scriptTag.src = browser.runtime.getURL('dist/inpage.js');
+    //scriptTag.innerHTML = "window.ApsioKeeper = " + JSON.stringify(_keeper_api);
     container.insertBefore(scriptTag, container.children[0]);
     // scriptTag.onload = () => {
     //   container.removeChild(scriptTag);
@@ -83,10 +77,10 @@ function injectScript() {
  */
 async function setupStreams() {
 
-    const pageStream = new LocalMessageDuplexStream({
-      name: 'apsio_keeper_content',
-      target: 'apsio_keeper_page',
-    });
+    //const pageStream = new LocalMessageDuplexStream({
+      //name: 'apsio_keeper_content',
+      //target: 'apsio_keeper_page',
+    //});
 
     //const pluginPort = browser.runtime.connect({ name: 'contentscript' });
     //const pluginStream = new PortStream(pluginPort);
@@ -100,7 +94,7 @@ async function setupStreams() {
 
   if(shouldInject()){
     injectScript();
-    setupStreams();
+    //setupStreams();
   }
 
   console.info("[vitesse-webext] Hello world from content script");

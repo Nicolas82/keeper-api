@@ -6,7 +6,7 @@ import EventEmitter from "events";
 import PortStream from 'extension-port-stream';
 //@ts-ignore
 import { setupDnode } from '../lib/dnode-util';
-import { url } from "inspector";
+import url from "url";
 
 // only on dev mode
 if (import.meta.hot) {
@@ -18,40 +18,40 @@ if (import.meta.hot) {
 
 // const bgPromise: Promise<any> = setupBackgroundService();
 
-// async function setupBackgroundService(): Promise<any> {
+ async function setupBackgroundService(): Promise<any> {
 
-//   const backgroundService = new BackgroundService({});
+   const backgroundService = new BackgroundService({});
 
-//   browser.runtime.onConnect.addListener(connectRemote);
+browser.runtime.onConnect.addListener(connectRemote);
 
-//   function connectExternal(remotePort: any) {
+   function connectExternal(remotePort: any) {
 
-//     const portStream = new PortStream(remotePort);
-//     //@ts-ignore
-//     const origin = url.parse(remotePort.sender.url).hostname;
-//     backgroundService.setupPageConnection(portStream, origin);
+     const portStream = new PortStream(remotePort);
+     //@ts-ignore
+     const origin = url.parse(remotePort.sender.url).hostname;
+     backgroundService.setupPageConnection(portStream, origin);
 
-//   }
+   }
 
-//   /**
-//  * Connecte un port à l'APSIO-KEEPER.
-//  * 
-//  * @param remotePort Le port donné 
-//  */
-//   function connectRemote(remotePort: any) {
+   /**
+  * Connecte un port à l'APSIO-KEEPER.
+  * 
+  * @param remotePort Le port donné 
+  */
+   function connectRemote(remotePort: any) {
 
-//     const processName = remotePort.name;
-//     if (processName === 'contentscript') {
+     const processName = remotePort.name;
+     if (processName === 'contentscript') {
 
-//       connectExternal(remotePort);
+       connectExternal(remotePort);
 
-//     }
+     }
 
-//   }
+   }
 
-//   return backgroundService;
+   return backgroundService;
 
-// }
+ }
 
 browser.runtime.onInstalled.addListener(async details => {
   // eslint-disable-next-line no-console
@@ -86,27 +86,31 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
   );
 });
 
-// class BackgroundService extends EventEmitter {
+ class BackgroundService extends EventEmitter {
 
-//   constructor(options = Object()) {
-//     super();
-//   }
+   constructor(options = Object()) {
+     super();
+   }
 
-//   //L'api qui va être injecté dans la page web
-//   getInpageApi(origin: any) {
+   //L'api qui va être injecté dans la page web
+   getInpageApi(origin: any) {
 
-//     return {
+     return {
 
-//     }
+      auth: async () => {
+        return "tu as réussi l'injection de l'api";
+      }
 
-//   }
+     }
 
-//   setupPageConnection(connectionStream:any, origin: any){
+   }
 
-//     const inpageApi = this.getInpageApi(origin);
-//     const dnode = setupDnode(connectionStream, inpageApi, 'inpageApi');
+   setupPageConnection(connectionStream:any, origin: any){
+
+     const inpageApi = this.getInpageApi(origin);
+     const dnode = setupDnode(connectionStream, inpageApi, 'inpageApi');
   
 
-//   }
+   }
 
-// }
+}

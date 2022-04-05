@@ -1,4 +1,3 @@
-
 import LocalMessageDuplexStream from 'post-message-stream';
 //@ts-ignore
 import { setupDnode, transformMethods, cbToPromise } from '../lib/dnode-util';
@@ -15,7 +14,9 @@ const createDeffer = () => {
     return def;
 }
 
-setupInpageApi().catch(e => console.error(e));
+/* setupInpageApi().catch(e => console.error(e)); */
+
+
 
 /**
  * Initialize l'api de l'Apsio Keeper dans la page web courante
@@ -31,13 +32,14 @@ async function setupInpageApi(){
     });
 
     const proxyApi:ProxyHandler<any> = {
-        get(target:any, prop:string){
+        get(target:any, prop:any){
+
             if(apsioApi[prop]){
                 return apsioApi[prop];
             }
 
             if(!cbs[prop] && prop !== 'on'){
-                cbs[prop] = function (...args) {
+                cbs[prop] = function (...args: any[]) {
                     const def = createDeffer();
                     args[prop] = args[prop] || [];
                     args[prop].push({ args, def });
@@ -46,7 +48,7 @@ async function setupInpageApi(){
             }
 
             if(!cbs[prop] && prop === 'on'){
-                cbs[prop] = function (...args){
+                cbs[prop] = function (...args: any[]){
                     args[prop] = args[prop] || [];
                     args[prop].push({ args });
                 };
@@ -62,7 +64,7 @@ async function setupInpageApi(){
         has() {
             return true;
         }
-    };
+    }; 
 
     (window as Record<string, any>).ApsioKeeper = new Proxy(apsioApp, proxyApi);
     
@@ -85,12 +87,12 @@ async function setupInpageApi(){
             remoteWithPromises.on = eventEmitter.on.bind(eventEmitter);
             resolve(remoteWithPromises);
         });
-    });
+    }); 
 
-    args = [];
+     args = [];
     cbs = Object();
     Object.assign(apsioApi, inpageApi);
-    apsioAppDef.resolve(apsioApi);
-    (window as Record<string, any>).ApsioKeeper = apsioApi;
+    apsioAppDef.resolve(apsioApi); 
+    //(window as Record<string, any>).ApsioKeeper = apsioApi;
 
 }
