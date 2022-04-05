@@ -16,42 +16,18 @@ if (import.meta.hot) {
   import("./contentScriptHMR");
 }
 
-// const bgPromise: Promise<any> = setupBackgroundService();
+browser.runtime.onConnect.addListener(async () => {
 
- async function setupBackgroundService(): Promise<any> {
+  browser.runtime.onMessageExternal.addListener( async (data) => {
 
-   const backgroundService = new BackgroundService({});
+    const tabId: number | undefined = (await browser.tabs.getCurrent()).id;
 
-browser.runtime.onConnect.addListener(connectRemote);
+    //@ts-ignore
+    return sendMessage("response", {data: "coucou"}, {context: "content-script", tabId});
 
-   function connectExternal(remotePort: any) {
+  });
 
-     const portStream = new PortStream(remotePort);
-     //@ts-ignore
-     const origin = url.parse(remotePort.sender.url).hostname;
-     backgroundService.setupPageConnection(portStream, origin);
-
-   }
-
-   /**
-  * Connecte un port à l'APSIO-KEEPER.
-  * 
-  * @param remotePort Le port donné 
-  */
-   function connectRemote(remotePort: any) {
-
-     const processName = remotePort.name;
-     if (processName === 'contentscript') {
-
-       connectExternal(remotePort);
-
-     }
-
-   }
-
-   return backgroundService;
-
- }
+});
 
 browser.runtime.onInstalled.addListener(async details => {
   // eslint-disable-next-line no-console
@@ -85,32 +61,3 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
     { context: "content-script", tabId }
   );
 });
-
- class BackgroundService extends EventEmitter {
-
-   constructor(options = Object()) {
-     super();
-   }
-
-   //L'api qui va être injecté dans la page web
-   getInpageApi(origin: any) {
-
-     return {
-
-      auth: async () => {
-        return "tu as réussi l'injection de l'api";
-      }
-
-     }
-
-   }
-
-   setupPageConnection(connectionStream:any, origin: any){
-
-     const inpageApi = this.getInpageApi(origin);
-     const dnode = setupDnode(connectionStream, inpageApi, 'inpageApi');
-  
-
-   }
-
-}

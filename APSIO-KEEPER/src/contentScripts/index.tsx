@@ -61,15 +61,16 @@ function injectScript() {
 
     scriptTag.setAttribute('async', 'false');
     scriptTag.src = browser.runtime.getURL('dist/inpage.js');
-    //scriptTag.innerHTML = "window.ApsioKeeper = " + JSON.stringify(_keeper_api);
     container.insertBefore(scriptTag, container.children[0]);
-    // scriptTag.onload = () => {
-    //   container.removeChild(scriptTag);
-    // }
+    scriptTag.onload = () => {
+      container.removeChild(scriptTag);
+    }
   }catch(error){
     console.error("Erreur lors de la tentative d'injection. ", error);
   }
 }
+
+
 
 /**
  * Configure la communication entre l'extension et 
@@ -77,24 +78,28 @@ function injectScript() {
  */
 async function setupStreams() {
 
-    //const pageStream = new LocalMessageDuplexStream({
-      //name: 'apsio_keeper_content',
-      //target: 'apsio_keeper_page',
-    //});
+  console.log("Je suis prêt à recevoir des messages");
 
-    //const pluginPort = browser.runtime.connect({ name: 'contentscript' });
-    //const pluginStream = new PortStream(pluginPort);
+  window.addEventListener("message", (event) => {
 
-    // pump(pageStream, pluginStream, pageStream, err => 
-    //   console.log(err));
+    console.log("je suis le content script et j'ai reçu" + event.data);
+
+  });
+
 }
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
 (() => {
 
+  onMessage("response", ({ data }) => {
+
+    console.log(data);
+
+  });
+
   if(shouldInject()){
     injectScript();
-    //setupStreams();
+    setupStreams();
   }
 
   console.info("[vitesse-webext] Hello world from content script");

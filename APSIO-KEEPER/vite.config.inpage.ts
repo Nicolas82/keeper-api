@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { sharedConfig } from "./vite.config";
 import { r, isDev } from "./scripts/utils";
 import packageJson from "./package.json";
+import nodePolyFills from 'rollup-plugin-polyfill-node';
 
 // bundling the content script using Vite
 export default defineConfig({
@@ -26,6 +27,9 @@ export default defineConfig({
         entryFileNames: "inpage.js",
         extend: true,
       },
+      plugins: [
+        nodePolyFills()
+      ]
     },
   },
   plugins: [...sharedConfig.plugins!],

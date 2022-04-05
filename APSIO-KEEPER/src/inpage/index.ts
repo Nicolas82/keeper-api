@@ -1,21 +1,4 @@
-import LocalMessageDuplexStream from 'post-message-stream';
-//@ts-ignore
-import { setupDnode, transformMethods, cbToPromise } from '../lib/dnode-util';
-import EventEmitter from 'events';
-
-
-const createDeffer = () => {
-    const def = Object();
-    def.promise = new Promise((res, rej) => {
-        def.resolve = res;
-        def.reject = rej;
-    });
-
-    return def;
-}
-
-/* setupInpageApi().catch(e => console.error(e)); */
-
+setupInpageApi().catch(e => console.error(e));
 
 
 /**
@@ -23,76 +6,26 @@ const createDeffer = () => {
  */
 async function setupInpageApi(){
 
-    let cbs = Object();
-    let args = Object();
-    const apsioAppDef = createDeffer();
-    const apsioApp = {};
-    let apsioApi = Object({
-        initialPromise: apsioAppDef.promise,
-    });
 
-    const proxyApi:ProxyHandler<any> = {
-        get(target:any, prop:any){
+    (window as Record<string, any>).ApsioKeeper = {
+        authSSI: async () => {
 
-            if(apsioApi[prop]){
-                return apsioApi[prop];
-            }
+            const data = { messageType: "authSSI" };
+            window.postMessage(JSON.stringify(data), "*");
 
-            if(!cbs[prop] && prop !== 'on'){
-                cbs[prop] = function (...args: any[]) {
-                    const def = createDeffer();
-                    args[prop] = args[prop] || [];
-                    args[prop].push({ args, def });
-                    return def.promise;
-                };
-            }
-
-            if(!cbs[prop] && prop === 'on'){
-                cbs[prop] = function (...args: any[]){
-                    args[prop] = args[prop] || [];
-                    args[prop].push({ args });
-                };
-            }
-
-            return cbs[prop];
         },
+        signAndPublishTransaction: async (data: Record<string, any>) => {
 
-        set(target:any, prop:any){
-            throw new Error('Not permitted');
+            data.messageType = "transaction";
+            data.publish = true;
+            window.postMessage(JSON.stringify(data), "*");
+            
         },
+        publicState: async () => {
 
-        has() {
-            return true;
+            const data = { messageType: "publicState" };
+            window.postMessage(JSON.stringify(data), "*");
         }
-    }; 
-
-    (window as Record<string, any>).ApsioKeeper = new Proxy(apsioApp, proxyApi);
-    
-    const apsioKeeperStream = new LocalMessageDuplexStream({
-        name: 'apsio_keeper_page',
-        target: 'apsio_keeper_content',
-    });
-
-    const eventEmitter = new EventEmitter();
-    const emitterApi = {
-        sendUpdate: async (state: any) => eventEmitter.emit('update', state),
-    }
-
-    const dnode = setupDnode(apsioKeeperStream, emitterApi, 'inpageApi');
-
-    const inpageApi = await new Promise(resolve => {
-        dnode.once('remote', (inpageApi: any) => {
-            let remoteWithPromises = transformMethods(cbToPromise, inpageApi);
-            // Zjout de l'événement sur l'objet background
-            remoteWithPromises.on = eventEmitter.on.bind(eventEmitter);
-            resolve(remoteWithPromises);
-        });
-    }); 
-
-     args = [];
-    cbs = Object();
-    Object.assign(apsioApi, inpageApi);
-    apsioAppDef.resolve(apsioApi); 
-    //(window as Record<string, any>).ApsioKeeper = apsioApi;
+    };
 
 }

@@ -1,5 +1,5 @@
 import { dirname, relative } from "path";
-import { defineConfig, UserConfig } from "vite";
+import { defineConfig, loadEnv, UserConfig } from "vite";
 import AutoImport from "unplugin-auto-import/vite";
 import { r, port, isDev } from "./scripts/utils";
 import react from "@vitejs/plugin-react";
@@ -45,7 +45,7 @@ export const sharedConfig: UserConfig = {
   },
 };
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ command, mode }) => ({
   ...sharedConfig,
   base: command === "serve" ? `http://localhost:${port}/` : "/dist/",
   server: {
@@ -67,7 +67,6 @@ export default defineConfig(({ command }) => ({
         background: r("src/background/index.html"),
         options: r("src/options/index.html"),
         popup: r("src/popup/index.html"),
-        inpage: r("src/inpage/index.ts"),
       },
     },
   },
