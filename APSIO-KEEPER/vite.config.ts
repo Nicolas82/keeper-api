@@ -1,5 +1,5 @@
 import { dirname, relative } from "path";
-import { defineConfig, loadEnv, UserConfig } from "vite";
+import { defineConfig, UserConfig } from "vite";
 import AutoImport from "unplugin-auto-import/vite";
 import { r, port, isDev } from "./scripts/utils";
 import react from "@vitejs/plugin-react";
@@ -11,9 +11,7 @@ export const sharedConfig: UserConfig = {
       "~/": `${r("src")}/`,
     },
   },
-  define: {
-    __DEV__: isDev,
-  },
+  define: {},
   plugins: [
     // React fast refresh doesn't work, cause injecting of preambleCode into index.html
     // TODO: fix it
