@@ -144,7 +144,7 @@ async function setupStreams() {
   const root = document.createElement("div");
   const styleEl = document.createElement("link");
   const shadowDOM =
-    container.attachShadow?.({ mode: __DEV__ ? "open" : "closed" }) ||
+    container.attachShadow?.({ mode: false ? "open" : "closed" }) ||
     container;
   styleEl.setAttribute("rel", "stylesheet");
   styleEl.setAttribute(

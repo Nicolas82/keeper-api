@@ -5,7 +5,6 @@ import pump from "pump";
 import EventEmitter from "events";
 import PortStream from 'extension-port-stream';
 //@ts-ignore
-import { setupDnode } from '../lib/dnode-util';
 import url from "url";
 import apsio from '@apsiocoin/apsio-transactions';
 
