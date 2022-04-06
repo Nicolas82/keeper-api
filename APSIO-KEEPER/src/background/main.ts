@@ -1,5 +1,5 @@
 import { sendMessage } from "webext-bridge";
-import { Tabs } from "webextension-polyfill";
+import { Runtime, Tabs } from "webextension-polyfill";
 import browser from "webextension-polyfill";
 import pump from "pump";
 import EventEmitter from "events";
@@ -7,6 +7,7 @@ import PortStream from 'extension-port-stream';
 //@ts-ignore
 import { setupDnode } from '../lib/dnode-util';
 import url from "url";
+import apsio from '@apsiocoin/apsio-transactions';
 
 // only on dev mode
 if (import.meta.hot) {
@@ -16,18 +17,68 @@ if (import.meta.hot) {
   import("./contentScriptHMR");
 }
 
-browser.runtime.onConnect.addListener(async () => {
 
-  browser.runtime.onMessageExternal.addListener( async (data) => {
+async function Useapi(data: any) {
 
-    const tabId: number | undefined = (await browser.tabs.getCurrent()).id;
+  var ret = {};
 
-    //@ts-ignore
-    return sendMessage("response", {data: "coucou"}, {context: "content-script", tabId});
+  switch (data.messageType) {
 
+    case 'authSSI':
+      do {
+        fetch("https://3000-nicolas82-sitecourswaves-p4pm3azwdlx.ws-eu38.gitpod.io/").then(async (data) => {
+          try {
+            ret = await data.json();
+          } catch (e: any) {
+            ret = e;
+          }
+        }).catch((error) => {
+          ret = error;
+        });
+      } while (JSON.stringify(ret) == JSON.stringify({}));
+
+    case 'signAndPublishTransaction':
+      var tx;
+      switch (data.type) {
+        //Issue transaction
+        case 3:
+          tx = apsio.issue(data.data, data.seed);
+          break;
+        //Transfer transaction
+        case 4:
+          tx = apsio.transfer(data.data, data.seed);
+          break;
+        //Data transaction
+        case 12:
+          tx = apsio.data(data.data, data.seed);
+          break;
+        //Invoke script transaction
+        case 16:
+          tx = apsio.invokeScript(data.data, data.seed);
+          break;
+        default:
+          tx = apsio.signTx(data.data, data.seed);
+      }
+      apsio.broadcast(tx, "https://nodes-testnet.wavesnodes.com").then((resp) => {
+        ret = resp;
+      });
+      break;
+  }
+
+  return ret;
+
+}
+
+function connected(connection: Runtime.Port) {
+
+  connection.onMessage.addListener((data) => {
+    var resp = Useapi(JSON.parse(data));
+    connection.postMessage(JSON.stringify(resp));
   });
 
-});
+}
+
+browser.runtime.onConnect.addListener(connected);
 
 browser.runtime.onInstalled.addListener(async details => {
   // eslint-disable-next-line no-console
@@ -52,6 +103,8 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
   } catch {
     return;
   }
+
+  sendMessage("response", { data: "coucou" }, { context: "content-script", tabId });
 
   // eslint-disable-next-line no-console
   console.log("previous tab", tab);

@@ -60,6 +60,7 @@
     "web-ext": "^6.4.0"
   },
   "dependencies": {
+    "@apsiocoin/apsio-transactions": "^0.0.1",
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1.4",
     "@metamask/post-message-stream": "^4.0.0",

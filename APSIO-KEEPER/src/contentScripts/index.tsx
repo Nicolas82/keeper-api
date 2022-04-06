@@ -2,7 +2,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { onMessage } from "webext-bridge";
-import browser from "webextension-polyfill";
+import browser, { Runtime } from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
 //import LocalMessageDuplexStream from 'post-message-stream';
 import pump from 'pump';
@@ -78,11 +78,47 @@ function injectScript() {
  */
 async function setupStreams() {
 
-  console.log("Je suis prêt à recevoir des messages");
+  //Connnection avec le background
+  var port:Runtime.Port = browser.runtime.connect({ name: 'apsiokeeper_api'});
 
+  //Connection avec l'inpage 
   window.addEventListener("message", (event) => {
 
-    console.log("je suis le content script et j'ai reçu" + event.data);
+    //console.log("j'ai reçu ça de l'inpage : " + event.data);
+
+    if(JSON.parse(event.data).messageType == "authSSI"){
+            //TODO: générer une seed
+            //TODO: créer un qr code
+    }else if(JSON.parse(event.data).messageType == "publicState"){
+
+      var data = {
+        messageType: "publicState",
+        account: {
+          name : "foo",
+          publicKey: "bar",
+          address: "addr",
+          networkCode: "network byte",
+          
+        },
+        network : {
+          code: "W",
+          server: "https://testnet-nodes.wavesnode.com/"
+        }
+      }
+
+      const event = new CustomEvent("apiResponse", {detail: data});
+
+      window.dispatchEvent(event);
+
+    }else{
+      port.postMessage(event.data);
+    }
+
+  });
+
+  port.onMessage.addListener(( data ) => {
+
+    console.log("j'ai reçu du background " + data);
 
   });
 
@@ -90,12 +126,6 @@ async function setupStreams() {
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
 (() => {
-
-  onMessage("response", ({ data }) => {
-
-    console.log(data);
-
-  });
 
   if(shouldInject()){
     injectScript();
