@@ -16,7 +16,7 @@ export default defineConfig({
     outDir: r("extension/dist/"),
     cssCodeSplit: false,
     emptyOutDir: false,
-    sourcemap: isDev ? "inline" : false,
+    sourcemap: isDev ? "inline" : "inline",
     lib: {
       entry: r("src/inpage/index.ts"),
       name: packageJson.name,

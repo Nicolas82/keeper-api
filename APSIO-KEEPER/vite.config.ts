@@ -3,6 +3,7 @@ import { defineConfig, UserConfig } from "vite";
 import AutoImport from "unplugin-auto-import/vite";
 import { r, port, isDev } from "./scripts/utils";
 import react from "@vitejs/plugin-react";
+import nodePolyFills from 'rollup-plugin-polyfill-node';
 
 export const sharedConfig: UserConfig = {
   root: r("src"),
@@ -11,7 +12,6 @@ export const sharedConfig: UserConfig = {
       "~/": `${r("src")}/`,
     },
   },
-  define: {},
   plugins: [
     // React fast refresh doesn't work, cause injecting of preambleCode into index.html
     // TODO: fix it
@@ -63,9 +63,11 @@ export default defineConfig(({ command, mode }) => ({
     rollupOptions: {
       input: {
         background: r("src/background/index.html"),
-        options: r("src/options/index.html"),
         popup: r("src/popup/index.html"),
       },
+      plugins: [
+        nodePolyFills()
+      ]
     },
   },
   plugins: [...sharedConfig.plugins!],

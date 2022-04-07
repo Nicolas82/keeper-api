@@ -3,7 +3,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { onMessage } from "webext-bridge";
 import browser, { Runtime } from "webextension-polyfill";
-import { ContentApp } from "./views/ContentApp";
 //import LocalMessageDuplexStream from 'post-message-stream';
 import pump from 'pump';
 import PortStream from 'extension-port-stream';
@@ -139,26 +138,4 @@ async function setupStreams() {
     console.log(`[vitesse-webext] Navigate from page "${data}"`);
   });
 
-  // mount component to context window
-  const container = document.createElement("div");
-  const root = document.createElement("div");
-  const styleEl = document.createElement("link");
-  const shadowDOM =
-    container.attachShadow?.({ mode: false ? "open" : "closed" }) ||
-    container;
-  styleEl.setAttribute("rel", "stylesheet");
-  styleEl.setAttribute(
-    "href",
-    browser.runtime.getURL("dist/contentScripts/style.css")
-  );
-  shadowDOM.appendChild(styleEl);
-  shadowDOM.appendChild(root);
-  document.body.appendChild(container);
-
-  ReactDOM.render(
-    <React.StrictMode>
-      <ContentApp />
-    </React.StrictMode>,
-    root
-  );
 })();
