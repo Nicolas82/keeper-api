@@ -4,6 +4,8 @@ import { useAtom } from "jotai";
 import { goTo, } from "react-chrome-extension-router";
 import { password } from "../../App";
 import { brand } from "../../theme/color";
+import { ChoosePassword } from "../ChoosePassword";
+import { Login } from "../Login";
 import { UnlockApp } from "../UnlockApp";
 
 export function Header() {
@@ -28,12 +30,18 @@ export function Header() {
         <Tooltip hasArrow label="Déconnexion">
           <Image
             src="/sign-out.png"
-            h="35px"
-            w="35px"
+            h="32px"
+            w="32px"
             left="10px"
-            rounded="full"
+            rounded="lg"
             position="absolute"
             bg="white"
+            cursor="pointer"
+            onClick={() => {
+              localStorage.removeItem("encryptedSeed");
+              //setPasswd(null);
+              goTo(Login);
+            }}
           />
         </Tooltip>)
       }
