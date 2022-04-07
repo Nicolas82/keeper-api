@@ -41,8 +41,8 @@ export function Header() {
             }}
             icon={ <Image
               src="/sign-out.png"
-              h={5}
-              w={5}
+              h={6}
+              w={6}
             />}
           />
          

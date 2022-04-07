@@ -92,8 +92,6 @@ function _getPublicState(){
 
   const event = new CustomEvent("apiResponse", {detail: data});
 
-  window.open(browser.runtime.getURL("dist/popup/index.html"), "_blank");
-
   window.dispatchEvent(event);
 
 }
@@ -103,10 +101,7 @@ function _getPublicState(){
  */
 function _useAuthSSI(background: Runtime.Port){
 
-  //TODO: générer une seed
-  //TODO: créer un qr code
-
-  background.postMessage(JSON.stringify({messageType: 'String'}));
+  background.postMessage(JSON.stringify({messageType: 'authSSI'}));
 
 }
 

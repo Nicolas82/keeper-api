@@ -24,7 +24,7 @@ async function Useapi(data: any) {
 
     case 'authSSI':
       browser.tabs.create({url:browser.runtime.getURL("dist/popup/index.html")});
-      ret = "Je suis trop fort";
+      ret = {test: "Je suis trop fort"};
       break;
 
     case 'signAndPublishTransaction':

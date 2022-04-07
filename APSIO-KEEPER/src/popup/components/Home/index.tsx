@@ -95,9 +95,6 @@ export function Home() {
                 </Tooltip>
               </Flex>
               <Text color="gray">A partager pour recevoir des Apsio coins</Text>
-                <Button bg={brand} color="white" mt="20px" size="xs">Ouvrir dans un nouvel onglet <ExternalLinkIcon ml="10px" onClick={()=>{
-                  window.open("https://www.geeksforgeeks.org/how-to-open-url-in-new-tab-using-javascript/",'_blank');
-                }}/></Button>
             </Box>
           </Box>
         }
