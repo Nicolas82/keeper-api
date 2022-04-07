@@ -8,9 +8,9 @@ import { UnlockApp } from "../UnlockApp";
 
 export function Header() {
 
-  const [passwd,setPasswd] = useAtom(password);
+  const [passwd, setPasswd] = useAtom(password);
 
-  function handleLock(){
+  function handleLock() {
     setPasswd(null)
     goTo(UnlockApp)
   }
@@ -24,14 +24,19 @@ export function Header() {
       justifyContent="center"
       position="relative"
     >
-      <Image
-        src="/sign-out.png"
-        h="35px"
-        w="35px"
-        left="10px"
-        rounded="full"
-        position="absolute"
-      />
+      {localStorage.getItem("encryptedSeed") && passwd && (
+        <Tooltip hasArrow label="Déconnexion">
+          <Image
+            src="/sign-out.png"
+            h="35px"
+            w="35px"
+            left="10px"
+            rounded="full"
+            position="absolute"
+            bg="white"
+          />
+        </Tooltip>)
+      }
 
       <Text fontWeight="bold">APSIO Keeper</Text>
       {localStorage.getItem("encryptedSeed") && passwd && (
