@@ -2,7 +2,7 @@
   "name": "apsio-keeper",
   "displayName": "APSIO Keeper",
   "version": "0.0.1",
-  "description": "[description]",
+  "description": "",
   "private": true,
   "scripts": {
     "dev": "npm run clear && cross-env NODE_ENV=development run-p dev:*",
