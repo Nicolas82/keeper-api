@@ -25,13 +25,14 @@ export function Header() {
       position="relative"
     >
       <Image
-        src="/logo.png"
+        src="/sign-out.png"
         h="35px"
         w="35px"
         left="10px"
         rounded="full"
         position="absolute"
       />
+
       <Text fontWeight="bold">APSIO Keeper</Text>
       {localStorage.getItem("encryptedSeed") && passwd && (
         <Tooltip hasArrow label="Vérouiller">

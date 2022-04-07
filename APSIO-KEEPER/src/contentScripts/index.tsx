@@ -70,6 +70,51 @@ function injectScript() {
 }
 
 
+/**
+ * Récupère la state publique du keeper
+ */
+function _getPublicState(){
+
+  var data = {
+    messageType: "publicState",
+    account: {
+      name : "foo",
+      publicKey: "bar",
+      address: "addr",
+      networkCode: "network byte",
+      
+    },
+    network : {
+      code: "W",
+      server: "https://testnet-nodes.wavesnode.com/"
+    }
+  }
+
+  const event = new CustomEvent("apiResponse", {detail: data});
+
+  window.dispatchEvent(event);
+
+}
+
+/**
+ * Effectue une requête de connexion de type authSSI
+ */
+function _useAuthSSI(){
+
+  //TODO: générer une seed
+  //TODO: créer un qr code
+
+}
+
+/**
+ * Envoi la transaction a traité par le background
+ */
+function _processTransaction(){
+
+  
+
+}
+
 
 /**
  * Configure la communication entre l'extension et 
@@ -83,31 +128,22 @@ async function setupStreams() {
   //Connection avec l'inpage 
   window.addEventListener("message", (event) => {
 
-    //console.log("j'ai reçu ça de l'inpage : " + event.data);
+    var messageType:string = JSON.parse(event.data).messageType;
 
-    if(JSON.parse(event.data).messageType == "authSSI"){
-            //TODO: générer une seed
-            //TODO: créer un qr code
-    }else if(JSON.parse(event.data).messageType == "publicState"){
+    switch(messageType){
+      case "authSSI":
+        _useAuthSSI();
+        break;
+      case "publicState":
+        _getPublicState();
+        break;
+      case "transaction":
+        _processTransaction();
+        break;
+    }
+    
+    else if(JSON.parse(event.data).messageType == "publicState"){
 
-      var data = {
-        messageType: "publicState",
-        account: {
-          name : "foo",
-          publicKey: "bar",
-          address: "addr",
-          networkCode: "network byte",
-          
-        },
-        network : {
-          code: "W",
-          server: "https://testnet-nodes.wavesnode.com/"
-        }
-      }
-
-      const event = new CustomEvent("apiResponse", {detail: data});
-
-      window.dispatchEvent(event);
 
     }else{
       port.postMessage(event.data);
