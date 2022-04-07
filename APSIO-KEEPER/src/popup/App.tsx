@@ -3,6 +3,7 @@ import { Router } from "react-chrome-extension-router";
 import { atom } from "jotai";
 import { Home } from "./components/Home";
 import { Login } from "./components/Login";
+import browser, { Runtime } from 'webextension-polyfill';
 
 export const password = atom<null | string>("o");
 
