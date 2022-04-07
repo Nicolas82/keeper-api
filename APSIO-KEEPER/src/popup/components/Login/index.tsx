@@ -180,7 +180,7 @@ export function Login() {
         >
           Enregistrer
         </Button>
-        <Box h="50px" position="fixed" bottom={0}>
+        <Box h="50px" position="absolute" bottom={0}>
           <Select
             bg="white"
             color={brand}

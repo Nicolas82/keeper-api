@@ -4,6 +4,8 @@ import { atom } from "jotai";
 import { Home } from "./components/Home";
 import { Login } from "./components/Login";
 import browser, { Runtime } from 'webextension-polyfill';
+import { ChoosePassword } from "./components/ChoosePassword";
+import { UnlockApp } from "./components/UnlockApp";
 
 export const password = atom<null | string>("o");
 
@@ -13,17 +15,17 @@ function App() {
   return (
     <ChakraProvider>
       {encryptedSeed ? (
-        <Box h="calc(100vh - 50px)" bg="#d7d7d7c7">
+        <Box h="full" bg="#d7d7d7c7">
           <Router>
-            {/* <UnlockApp /> */}
-            <Home/>
+            <UnlockApp />
+            {/* <Home/> */}
           </Router>
         </Box>
       ) : (
-        <Box h="calc(100vh - 50px)" bg="#d7d7d7c7">
+        <Box h="full" bg="#d7d7d7c7">
           <Router>
-            {/* <ChoosePassword /> */}
-            <Login/>
+            <ChoosePassword />
+            {/* <Login/> */}
           </Router>
         </Box>
       )}
