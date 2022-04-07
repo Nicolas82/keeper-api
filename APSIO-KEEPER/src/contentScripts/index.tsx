@@ -4,8 +4,6 @@ import ReactDOM from "react-dom";
 import { onMessage } from "webext-bridge";
 import browser, { Runtime } from "webextension-polyfill";
 //import LocalMessageDuplexStream from 'post-message-stream';
-import pump from 'pump';
-import PortStream from 'extension-port-stream';
 
 /**
  * Regarde si le type du document est valide 
@@ -108,10 +106,12 @@ function _useAuthSSI(){
 
 /**
  * Envoi la transaction a traité par le background
+ * @param data Les données à envoyées au background
+ * @param background la connection au background
  */
-function _processTransaction(){
+function _processTransaction(data:Object, background:Runtime.Port){
 
-  
+  background.postMessage(JSON.stringify(data));
 
 }
 
@@ -123,12 +123,14 @@ function _processTransaction(){
 async function setupStreams() {
 
   //Connnection avec le background
-  var port:Runtime.Port = browser.runtime.connect({ name: 'apsiokeeper_api'});
+  var port_background:Runtime.Port = browser.runtime.connect({ name: 'apsiokeeper_api'});
+  var port_popup:Runtime.Port = browser.runtime.connect({ name: 'apsiokeeper_popup '});
 
   //Connection avec l'inpage 
   window.addEventListener("message", (event) => {
 
     var messageType:string = JSON.parse(event.data).messageType;
+    var data:Object = JSON.parse(event.data);
 
     switch(messageType){
       case "authSSI":
@@ -138,20 +140,13 @@ async function setupStreams() {
         _getPublicState();
         break;
       case "transaction":
-        _processTransaction();
+        _processTransaction(data, port_background);
         break;
-    }
-    
-    else if(JSON.parse(event.data).messageType == "publicState"){
-
-
-    }else{
-      port.postMessage(event.data);
     }
 
   });
 
-  port.onMessage.addListener(( data ) => {
+  port_background.onMessage.addListener(( data ) => {
 
     console.log("j'ai reçu du background " + data);
 

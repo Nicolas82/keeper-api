@@ -6,6 +6,7 @@ import { atom } from "jotai";
 import { UnlockApp } from "./components/UnlockApp";
 import { Home } from "./components/Home";
 import { Login } from "./components/Login";
+import browser, { Runtime } from 'webextension-polyfill';
 
 export const password = atom<null | string>("o");
 

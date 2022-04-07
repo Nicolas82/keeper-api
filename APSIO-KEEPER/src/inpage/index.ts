@@ -28,6 +28,7 @@ window.addEventListener("apiResponse", (e) => {
             (window as Record<string, any>)._apsioKeeper_publicState.resolve(data);
             break;
         case "authSSI":
+            (window as Record<string, any>)._apsioKeeper_authSSI.resolve(data);
             break;
         case "transaction":
             break;

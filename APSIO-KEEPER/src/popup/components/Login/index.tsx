@@ -1,4 +1,12 @@
-import { Box, Button, Flex, Select, Switch, Text, Textarea } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Select,
+  Switch,
+  Text,
+  Textarea,
+} from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { brand } from "../../theme/color";
 import {
@@ -9,19 +17,24 @@ import {
   TEST_NET_CHAIN_ID,
   sharedKey,
   messageDecrypt,
-  privateKey
+  privateKey,
 } from "@waves/ts-lib-crypto";
-import { AES } from "crypto-js"
+import { AES } from "crypto-js";
 import { password } from "../../App";
-import { useAtomValue } from "jotai"
+import { useAtomValue } from "jotai";
 import { goTo } from "react-chrome-extension-router";
 import { Home } from "../Home";
-import QRCode from 'react-qr-code';
+import QRCode from "react-qr-code";
 import axios from "axios";
+import { dataExample } from "./data";
 
 export function Login() {
   const passwd = useAtomValue(password);
-  const [seed, setSeed] = useState("agree end glass enforce whisper measure clip table file pear daring undo tool leaf own");
+  const [seed, setSeed] = useState(
+    /*"agree end glass enforce whisper measure clip table file pear daring undo tool leaf own"*/
+    ""
+  );
+  const [qrcodeData, setQrcodeData] = useState("");
 
   // Address find thanks seed
   const [address, setAddress] = useState("...");
@@ -31,7 +44,6 @@ export function Login() {
 
   // Connection with qr code or textarea
   const [isQrCode, setIsQrCode] = useState(true);
-
 
   function handleChange(event: ChangeEvent<HTMLTextAreaElement>) {
     const value = event.currentTarget.value;
@@ -49,49 +61,60 @@ export function Login() {
   }
 
   function handleSaveSeed() {
-
     const encryptedSeed = AES.encrypt(seed, passwd!).toString();
     window.localStorage.setItem("encryptedSeed", encryptedSeed);
     window.localStorage.setItem("net", net.toString());
     goTo(Home);
   }
 
-  function getQrCodeData() {
-
+  useEffect(() => {
     const seed = randomSeed();
     const key = publicKey(seed);
-    const url = "https://3000-nicolas82-sitecourswaves-p4pm3azwdlx.ws-eu38.gitpod.io/api/encrypted/" + key;
+    const url = "https://3000-nicolas82-sitecourswaves-xu264v449r6.ws-eu38.gitpod.io/api/encrypted/" + key;
 
-    const data = { url: url, publicKey: key }
+    const data = { url: url, publicKey: key };
 
     window.localStorage.setItem("publicKey", key);
     window.localStorage.setItem("randomSeed", seed);
 
     waitingData(url);
-    console.log(data)
-    return JSON.stringify(data);
-  }
+    setQrcodeData(JSON.stringify(data))
+  }, [])
 
   async function waitingData(url: string) {
+    var decrypted: string | null = null;
 
-    while (true) {
+    while (decrypted == null) {
       if (isQrCode) {
-        axios.get(url).catch(() => {}).then(
-          (result: any) => {
+        axios
+          .get(url)
+          .then((result: any) => {
+            //console.log(result)
             const { data } = result;
 
-            const sharedKeyB = sharedKey(privateKey(window.localStorage.getItem("randomSeed")!), data.publicKey, 'apsiocoin')
-            const decrypted = messageDecrypt(sharedKeyB, data.encrypted)
-
-            console.log(decrypted)
-          }
-        );
+            const sharedKeyB = sharedKey(
+              privateKey(window.localStorage.getItem("randomSeed")!),
+              data.publicKey,
+              "apsiocoin"
+            );
+            decrypted = messageDecrypt(sharedKeyB, JSON.parse(data.encrypted));
+          })
+          .catch((err) => {
+            //console.log(err);
+          });
       }
-      await new Promise(r => setTimeout(r, 2000));
+      if (!decrypted) {
+
+        await new Promise((r) => setTimeout(r, 500));
+      }
     }
+    setSeed(decrypted)
 
+    const encryptedSeed = AES.encrypt(decrypted, passwd!).toString();
+    window.localStorage.setItem("encryptedSeed", encryptedSeed);
+    window.localStorage.setItem("net", net.toString());
+    goTo(Home);
   }
-
 
   return (
     <Flex
@@ -106,39 +129,39 @@ export function Login() {
       </Text>
 
       <Flex alignItems="center" mt="20px" mb="10px">
-
-        <Switch isChecked={isQrCode} onChange={(e) => {
-          setIsQrCode(e.currentTarget.checked)
-        }} />
-        <Text ml="8px">
-          {isQrCode ? "QR Code" : "Seed"}
-        </Text>
+        <Switch
+          isChecked={isQrCode}
+          onChange={(e) => {
+            setIsQrCode(e.currentTarget.checked);
+          }}
+        />
+        <Text ml="8px">{isQrCode ? "QR Code" : "Seed"}</Text>
       </Flex>
 
       {/* // Print qr code */}
-      {!isQrCode && <>
-
-        <Textarea
-          placeholder="Entrez votre clé privée"
-          resize="none"
-          p="10px"
-          value={seed}
-          bg="white"
-          color={brand}
-          onChange={handleChange}
-        />
-      </>
-      }
+      {!isQrCode && (
+        <>
+          <Textarea
+            placeholder="Entrez votre clé privée"
+            resize="none"
+            p="10px"
+            value={seed}
+            bg="white"
+            color={brand}
+            onChange={handleChange}
+          />
+        </>
+      )}
 
       {/* // Print text area */}
-      {isQrCode && <Flex alignItems="center" flexDir="column" mx="auto">
-        <Text mb="10px" textAlign="center">
-          Flashez à l'aide de <Text as="em">Mobile Keeper</Text>
-        </Text>
-        <QRCode value={getQrCodeData()} size={150} />
-      </Flex>
-      }
-
+      {isQrCode && (
+        <Flex alignItems="center" flexDir="column" mx="auto">
+          <Text mb="10px" textAlign="center">
+            Flashez à l'aide de <Text as="em">Mobile Keeper</Text>
+          </Text>
+          <QRCode value={qrcodeData} size={150} />
+        </Flex>
+      )}
 
       <Text mt="20px" mb="5px">
         Adresse
@@ -146,7 +169,13 @@ export function Login() {
       <Box border="1px solid" borderColor="gray.400" bg="white" rounded="md">
         <Text color="gray.500">{address}</Text>
       </Box>
-      <Button mt="20px" bg={brand} color="white" onClick={handleSaveSeed} isDisabled={address == "..."}>
+      <Button
+        mt="20px"
+        bg={brand}
+        color="white"
+        onClick={handleSaveSeed}
+        isDisabled={address == "..."}
+      >
         Enregistrer
       </Button>
       <Box h="50px" position="fixed" bottom={0}>
@@ -154,7 +183,7 @@ export function Login() {
           bg="white"
           color={brand}
           onChange={(e) => {
-            const newNet = parseInt(e.currentTarget.value)
+            const newNet = parseInt(e.currentTarget.value);
             setNet(newNet);
             changeAdress(seed.trim(), newNet);
           }}
