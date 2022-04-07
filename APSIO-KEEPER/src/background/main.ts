@@ -3,7 +3,6 @@ import { Runtime, Tabs } from "webextension-polyfill";
 import browser from "webextension-polyfill";
 import pump from "pump";
 import EventEmitter from "events";
-import PortStream from 'extension-port-stream';
 //@ts-ignore
 import url from "url";
 import apsio from '@apsiocoin/apsio-transactions';
@@ -24,17 +23,9 @@ async function Useapi(data: any) {
   switch (data.messageType) {
 
     case 'authSSI':
-      do {
-        fetch("https://3000-nicolas82-sitecourswaves-p4pm3azwdlx.ws-eu38.gitpod.io/").then(async (data) => {
-          try {
-            ret = await data.json();
-          } catch (e: any) {
-            ret = e;
-          }
-        }).catch((error) => {
-          ret = error;
-        });
-      } while (JSON.stringify(ret) == JSON.stringify({}));
+      browser.tabs.create({url:browser.runtime.getURL("dist/popup/index.html")});
+      ret = "Je suis trop fort";
+      break;
 
     case 'signAndPublishTransaction':
       var tx;

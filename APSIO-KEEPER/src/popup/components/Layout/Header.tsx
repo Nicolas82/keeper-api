@@ -28,21 +28,24 @@ export function Header() {
     >
       {localStorage.getItem("encryptedSeed") && passwd && (
         <Tooltip hasArrow label="Déconnexion">
-          <Image
-            src="/sign-out.png"
-            h="32px"
-            w="32px"
-            left="10px"
-            rounded="lg"
+          <IconButton
+            aria-label="Log out"
             position="absolute"
-            bg="white"
-            cursor="pointer"
+            right="10px"
+            size="sm"
+            color={brand}
             onClick={() => {
               localStorage.removeItem("encryptedSeed");
               //setPasswd(null);
               goTo(Login);
             }}
+            icon={ <Image
+              src="/sign-out.png"
+              h={5}
+              w={5}
+            />}
           />
+         
         </Tooltip>)
       }
 
@@ -52,7 +55,7 @@ export function Header() {
           <IconButton
             aria-label="Lock extension"
             position="absolute"
-            right="10px"
+            left="10px"
             size="sm"
             color={brand}
             onClick={handleLock}

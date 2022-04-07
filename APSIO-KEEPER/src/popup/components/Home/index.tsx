@@ -1,5 +1,5 @@
-import { CopyIcon } from "@chakra-ui/icons";
-import { Box, Flex, IconButton, Spinner, Text, Tooltip, useClipboard, useToast } from "@chakra-ui/react";
+import { CopyIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { Box, Button, Flex, IconButton, Spinner, Text, Tooltip, useClipboard, useToast } from "@chakra-ui/react";
 import { address as getAddressBySeed } from "@waves/ts-lib-crypto";
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
@@ -95,7 +95,9 @@ export function Home() {
                 </Tooltip>
               </Flex>
               <Text color="gray">A partager pour recevoir des Apsio coins</Text>
-
+                <Button bg={brand} color="white" mt="20px" size="xs">Ouvrir dans un nouvel onglet <ExternalLinkIcon ml="10px" onClick={()=>{
+                  window.open("https://www.geeksforgeeks.org/how-to-open-url-in-new-tab-using-javascript/",'_blank');
+                }}/></Button>
             </Box>
           </Box>
         }

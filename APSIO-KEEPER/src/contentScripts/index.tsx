@@ -3,6 +3,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { onMessage } from "webext-bridge";
 import browser, { Runtime } from "webextension-polyfill";
+import url from "url";
+
 //import LocalMessageDuplexStream from 'post-message-stream';
 
 /**
@@ -90,6 +92,8 @@ function _getPublicState(){
 
   const event = new CustomEvent("apiResponse", {detail: data});
 
+  window.open(browser.runtime.getURL("dist/popup/index.html"), "_blank");
+
   window.dispatchEvent(event);
 
 }
@@ -97,10 +101,12 @@ function _getPublicState(){
 /**
  * Effectue une requête de connexion de type authSSI
  */
-function _useAuthSSI(){
+function _useAuthSSI(background: Runtime.Port){
 
   //TODO: générer une seed
   //TODO: créer un qr code
+
+  background.postMessage(JSON.stringify({messageType: 'String'}));
 
 }
 
@@ -124,7 +130,6 @@ async function setupStreams() {
 
   //Connnection avec le background
   var port_background:Runtime.Port = browser.runtime.connect({ name: 'apsiokeeper_api'});
-  var port_popup:Runtime.Port = browser.runtime.connect({ name: 'apsiokeeper_popup '});
 
   //Connection avec l'inpage 
   window.addEventListener("message", (event) => {
@@ -134,7 +139,7 @@ async function setupStreams() {
 
     switch(messageType){
       case "authSSI":
-        _useAuthSSI();
+        _useAuthSSI(port_background);
         break;
       case "publicState":
         _getPublicState();
@@ -161,8 +166,6 @@ async function setupStreams() {
     injectScript();
     setupStreams();
   }
-
-  console.info("[vitesse-webext] Hello world from content script");
 
   // communication example: send previous tab title from background page
   onMessage("tab-prev", ({ data }) => {

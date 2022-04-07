@@ -68,17 +68,17 @@ export function Login() {
   }
 
   useEffect(() => {
-    const seed = randomSeed();
-    const key = publicKey(seed);
-    const url = "https://3000-nicolas82-sitecourswaves-xu264v449r6.ws-eu38.gitpod.io/api/encrypted/" + key;
+      const seed = randomSeed();
+      const key = publicKey(seed);
+      const url = "https://3000-nicolas82-sitecourswaves-xu264v449r6.ws-eu38.gitpod.io/api/encrypted/" + key;
 
-    const data = { url: url, publicKey: key };
+      const data = { url: url, publicKey: key };
 
-    window.localStorage.setItem("publicKey", key);
-    window.localStorage.setItem("randomSeed", seed);
+      window.localStorage.setItem("publicKey", key);
+      window.localStorage.setItem("randomSeed", seed);
 
-    waitingData(url);
-    setQrcodeData(JSON.stringify(data))
+      waitingData(url);
+      setQrcodeData(JSON.stringify(data))
   }, [])
 
   async function waitingData(url: string) {
