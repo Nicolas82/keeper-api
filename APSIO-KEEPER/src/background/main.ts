@@ -6,6 +6,9 @@ import EventEmitter from "events";
 //@ts-ignore
 import url from "url";
 import apsio from '@apsiocoin/apsio-transactions';
+import { WalletController } from './../controllers/WalletController';
+
+var walletController = new WalletController();
 
 // only on dev mode
 if (import.meta.hot) {
@@ -16,6 +19,7 @@ if (import.meta.hot) {
 }
 
 
+
 async function Useapi(data: any) {
 
   var ret = {};
@@ -24,34 +28,40 @@ async function Useapi(data: any) {
 
     case 'authSSI':
       browser.tabs.create({url:browser.runtime.getURL("dist/popup/index.html")});
-      ret = {test: "Je suis trop fort"};
+      ret = {
+        messageType: data.messageType,
+        response: "Je suis trop fort"
+      };
       break;
 
     case 'signAndPublishTransaction':
+      var txData = data.txData;
+      var seed:string = walletController.getSeed();
       var tx;
-      switch (data.type) {
+      switch (txData.type) {
         //Issue transaction
         case 3:
-          tx = apsio.issue(data.data, data.seed);
+          tx = apsio.issue(txData.data, seed);
           break;
         //Transfer transaction
         case 4:
-          tx = apsio.transfer(data.data, data.seed);
+          tx = apsio.transfer(txData.data, seed);
           break;
         //Data transaction
         case 12:
-          tx = apsio.data(data.data, data.seed);
+          tx = apsio.data(txData.data, seed);
           break;
         //Invoke script transaction
         case 16:
-          tx = apsio.invokeScript(data.data, data.seed);
+          tx = apsio.invokeScript(txData.data, seed);
           break;
         default:
-          tx = apsio.signTx(data.data, data.seed);
+          tx = apsio.signTx(txData.data, seed);
       }
-      apsio.broadcast(tx, "https://nodes-testnet.wavesnodes.com").then((resp) => {
-        ret = resp;
-      });
+      ret = {
+        messageType: data.messageType,
+        response: await apsio.broadcast(tx, "https://nodes-testnet.wavesnodes.com")
+      };
       break;
   }
 

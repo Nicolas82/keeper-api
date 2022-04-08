@@ -53,6 +53,9 @@ function shouldInject() {
  * @param content le code à être éxécuté par le document
  */
 function injectScript() {
+
+  console.log("injection ....");
+
   try{
 
     const container = document.head || document.documentElement;
@@ -148,7 +151,9 @@ async function setupStreams() {
 
   port_background.onMessage.addListener(( data ) => {
 
-    console.log("j'ai reçu du background " + data);
+    const event = new CustomEvent("apiResponse", {detail: data});
+
+    window.dispatchEvent(event);
 
   });
 
@@ -156,6 +161,8 @@ async function setupStreams() {
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
 (() => {
+
+  console.log("injection ....");
 
   if(shouldInject()){
     injectScript();
