@@ -70,7 +70,7 @@ export function Login() {
   useEffect(() => {
       const seed = randomSeed();
       const key = publicKey(seed);
-      const url = "https://3000-nicolas82-sitecourswaves-xu264v449r6.ws-eu38.gitpod.io/api/encrypted/" + key;
+      const url = "http://apsio01.iut-blagnac.fr/api/encrypted/" + key;
 
       const data = { url: url, publicKey: key };
 

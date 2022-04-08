@@ -25,6 +25,7 @@ async function Useapi(data: any) {
     case 'authSSI':
       browser.tabs.create({url:browser.runtime.getURL("dist/popup/index.html")});
       ret = {test: "Je suis trop fort"};
+      
       break;
 
     case 'signAndPublishTransaction':
@@ -61,7 +62,8 @@ async function Useapi(data: any) {
 
 function connected(connection: Runtime.Port) {
 
-  
+  console.log(connection.name);
+
   connection.onMessage.addListener((data) => {
     var resp = Useapi(JSON.parse(data));
     connection.postMessage(JSON.stringify(resp));

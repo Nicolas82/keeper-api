@@ -12,6 +12,14 @@ export const password = atom<null | string>("o");
 function App() {
   const encryptedSeed = localStorage.getItem("encryptedSeed");
 
+  var back:Runtime.Port = browser.runtime.connect({ name: 'apsiokeeper_popup'});
+
+  back.onMessage.addListener( (data) => {
+
+    console.log("ma merde");
+
+  });
+
   return (
     <ChakraProvider>
       {encryptedSeed ? (
