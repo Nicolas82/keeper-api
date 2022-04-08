@@ -25,12 +25,13 @@ window.addEventListener("apiResponse", (e) => {
     var data = e.detail;
     switch (data.messageType) {
         case "publicState":
-            (window as Record<string, any>)._apsioKeeper_publicState.resolve(data);
+            (window as Record<string, any>)._apsioKeeper_publicState.resolve(data.response);
             break;
         case "authSSI":
-            (window as Record<string, any>)._apsioKeeper_authSSI.resolve(data);
+            (window as Record<string, any>)._apsioKeeper_authSSI.resolve(data.response);
             break;
-        case "transaction":
+        case "signAndPublishTransaction":
+            (window as Record<string, any>)._apsioKeeper_spTransaction.resolve(data.response);
             break;
     }
 });
@@ -53,9 +54,15 @@ async function setupInpageApi() {
         },
         signAndPublishTransaction: async (data: Record<string, any>) => {
 
-            data.messageType = "transaction";
-            data.publish = true;
-            window.postMessage(JSON.stringify(data), "*");
+            (window as Record<string, any>)._apsioKeeper_spTransaction = defer();
+
+            var finalData = {
+                messageType: "signAndPublishTransaction",
+                txData: data
+            }
+            window.postMessage(JSON.stringify(finalData), "*");
+
+            return (window as Record<string, any>)._apsioKeeper_spTransaction;
 
         },
         publicState: async () => {
