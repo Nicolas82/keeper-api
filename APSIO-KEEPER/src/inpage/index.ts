@@ -52,7 +52,7 @@ async function setupInpageApi() {
             return (window as Record<string, any>)._apsioKeeper_authSSI;
 
         },
-        signAndPublishTransaction: async (data: Record<string, any>) => {
+        signAndPublishTransaction: async (data: Object) => {
 
             (window as Record<string, any>)._apsioKeeper_spTransaction = defer();
 

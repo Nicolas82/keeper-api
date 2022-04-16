@@ -1,14 +1,9 @@
 import { sendMessage } from "webext-bridge";
 import { Runtime, Tabs } from "webextension-polyfill";
 import browser from "webextension-polyfill";
-import pump from "pump";
-import EventEmitter from "events";
 //@ts-ignore
 import url from "url";
 import apsio from '@apsiocoin/apsio-transactions';
-import { WalletController } from './../controllers/WalletController';
-
-var walletController = new WalletController();
 
 // only on dev mode
 if (import.meta.hot) {
@@ -36,7 +31,7 @@ async function Useapi(data: any) {
 
     case 'signAndPublishTransaction':
       var txData = data.txData;
-      var seed:string = walletController.getSeed();
+      var seed:string = /*walletController.getSeed();*/ "agree end glass enforce whisper measure clip table file pear daring undo tool leaf own";
       var tx;
       switch (txData.type) {
         //Issue transaction
@@ -68,10 +63,9 @@ async function Useapi(data: any) {
   return ret;
 
 }
-
+//Met la connexion en le content-script et le background
 function connected(connection: Runtime.Port) {
 
-  
   connection.onMessage.addListener((data) => {
     var resp = Useapi(JSON.parse(data));
     connection.postMessage(JSON.stringify(resp));
@@ -104,8 +98,6 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
   } catch {
     return;
   }
-
-  sendMessage("response", { data: "coucou" }, { context: "content-script", tabId });
 
   // eslint-disable-next-line no-console
   console.log("previous tab", tab);

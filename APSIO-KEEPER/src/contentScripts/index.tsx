@@ -1,9 +1,7 @@
 /* eslint-disable no-console */
-import React from "react";
-import ReactDOM from "react-dom";
+import { MoonIcon } from "@chakra-ui/icons";
 import { onMessage } from "webext-bridge";
 import browser, { Runtime } from "webextension-polyfill";
-import url from "url";
 
 //import LocalMessageDuplexStream from 'post-message-stream';
 
@@ -64,9 +62,11 @@ function injectScript() {
     scriptTag.setAttribute('async', 'false');
     scriptTag.src = browser.runtime.getURL('dist/inpage.js');
     container.insertBefore(scriptTag, container.children[0]);
+
     scriptTag.onload = () => {
       container.removeChild(scriptTag);
     }
+
   }catch(error){
     console.error("Erreur lors de la tentative d'injection. ", error);
   }
@@ -136,12 +136,15 @@ async function setupStreams() {
     var data:Object = JSON.parse(event.data);
 
     switch(messageType){
+
       case "authSSI":
         _useAuthSSI(port_background);
         break;
+
       case "publicState":
         _getPublicState();
         break;
+
       case "transaction":
         _processTransaction(data, port_background);
         break;
@@ -149,6 +152,7 @@ async function setupStreams() {
 
   });
 
+  //Dès qu'on reçoit un message du background on le redirige
   port_background.onMessage.addListener(( data ) => {
 
     const event = new CustomEvent("apiResponse", {detail: data});
@@ -162,16 +166,15 @@ async function setupStreams() {
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
 (() => {
 
-  console.log("injection ....");
-
-  if(shouldInject()){
+  //Injection du script dans la page courante
+  if(/*shouldInject()*/true){
     injectScript();
     setupStreams();
   }
 
   // communication example: send previous tab title from background page
-  onMessage("tab-prev", ({ data }) => {
-    console.log(`[vitesse-webext] Navigate from page "${data}"`);
-  });
+  // onMessage("tab-prev", ({ data }) => {
+  //   console.log(`[vitesse-webext] Navigate from page "${data}"`);
+  // });
 
 })();
