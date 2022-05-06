@@ -27,6 +27,7 @@ import { Home } from "../Home";
 import QRCode from "react-qr-code";
 import axios from "axios";
 import { Header } from "../Layout/Header";
+import browser from 'webextension-polyfill';
 
 export function Login() {
   const passwd = useAtomValue(password);
@@ -44,6 +45,9 @@ export function Login() {
 
   // Connection with qr code or textarea
   const [isQrCode, setIsQrCode] = useState(true);
+  
+  //Connection with the background
+  const background = browser.runtime.connect( {name: 'apsiokeeper_popup'} );
 
   function handleChange(event: ChangeEvent<HTMLTextAreaElement>) {
     const value = event.currentTarget.value;
@@ -64,21 +68,33 @@ export function Login() {
     const encryptedSeed = AES.encrypt(seed, passwd!).toString();
     window.localStorage.setItem("encryptedSeed", encryptedSeed);
     window.localStorage.setItem("net", net.toString());
+    var backgroundData = {
+      func: 'saveSeed',
+      params: {
+        seed: seed,
+        network: net
+      }
+    }
+    
+    background.postMessage(JSON.stringify(backgroundData));
     goTo(Home);
   }
 
+  //Actualise le QRCode quand il reçoit des informations du background
+  background.onMessage.addListener( ( message ) => {
+    console.log(message);
+    var messageData = JSON.parse(message);
+    window.localStorage.setItem("publicKey", messageData.key);
+    window.localStorage.setItem("randomSeed", messageData.seed);
+    const url = messageData.qrcodeData + messageData.key;
+    const data = { url: url, publicKey: messageData.key };
+    waitingData(url);
+    setQrcodeData(JSON.stringify(data));
+  })
+
   useEffect(() => {
-      const seed = randomSeed();
-      const key = publicKey(seed);
-      const url = "https://3000-nicolas82-sitecourswaves-xu264v449r6.ws-eu38.gitpod.io/api/encrypted/" + key;
-
-      const data = { url: url, publicKey: key };
-
-      window.localStorage.setItem("publicKey", key);
-      window.localStorage.setItem("randomSeed", seed);
-
-      waitingData(url);
-      setQrcodeData(JSON.stringify(data))
+      background.postMessage(JSON.stringify({func: 'getQrCodeData', params:{}}))
+      setQrcodeData("")
   }, [])
 
   async function waitingData(url: string) {
@@ -113,6 +129,15 @@ export function Login() {
     const encryptedSeed = AES.encrypt(decrypted, passwd!).toString();
     window.localStorage.setItem("encryptedSeed", encryptedSeed);
     window.localStorage.setItem("net", net.toString());
+    var backgroundData = {
+      func: 'saveSeed',
+      params: {
+        seed: seed,
+        network : net
+      }
+    }
+
+    background.postMessage(JSON.stringify(backgroundData));
     goTo(Home);
   }
 

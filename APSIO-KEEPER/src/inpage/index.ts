@@ -22,16 +22,20 @@ function defer() {
 window.addEventListener("apiResponse", (e) => {
 
     //@ts-ignore
-    var data = e.detail;
+    var data = JSON.parse(e.detail);
+
     switch (data.messageType) {
         case "publicState":
-            (window as Record<string, any>)._apsioKeeper_publicState.resolve(data.response);
+            data.response == null ? (window as Record<string, any>)._apsioKeeper_publicState.reject(data.error) 
+                : (window as Record<string, any>)._apsioKeeper_publicState.resolve(data.response);
             break;
         case "authSSI":
-            (window as Record<string, any>)._apsioKeeper_authSSI.resolve(data.response);
+            data.response == null ? (window as Record<string, any>)._apsioKeeper_authSSI.reject(data.error) 
+                : (window as Record<string, any>)._apsioKeeper_authSSI.resolve(data.response);
             break;
         case "signAndPublishTransaction":
-            (window as Record<string, any>)._apsioKeeper_spTransaction.resolve(data.response);
+            data.response == null ? (window as Record<string, any>)._apsioKeeper_spTransaction.reject(data.error)
+                : (window as Record<string, any>)._apsioKeeper_spTransaction.resolve(data.response);
             break;
     }
 });
@@ -42,11 +46,11 @@ window.addEventListener("apiResponse", (e) => {
 async function setupInpageApi() {
 
     (window as Record<string, any>).ApsioKeeper = {
-        authSSI: async () => {
+        authSSI: async (url:string) => {
 
             (window as Record<string, any>)._apsioKeeper_authSSI = defer();
 
-            const data = { messageType: "authSSI" };
+            const data = { messageType: "authSSI", url: url};
             window.postMessage(JSON.stringify(data), "*");
 
             return (window as Record<string, any>)._apsioKeeper_authSSI;

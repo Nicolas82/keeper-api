@@ -12,6 +12,9 @@ export function Header() {
 
   const [passwd, setPasswd] = useAtom(password);
 
+  //Connection with the background
+  const background = browser.runtime.connect( {name: 'apsiokeeper_header'} );
+
   function handleLock() {
     setPasswd(null)
     goTo(UnlockApp)
@@ -36,6 +39,10 @@ export function Header() {
             color={brand}
             onClick={() => {
               localStorage.removeItem("encryptedSeed");
+              background.postMessage(JSON.stringify({
+                func: 'removeSeed',
+                params: {}
+              }));
               //setPasswd(null);
               goTo(Login);
             }}

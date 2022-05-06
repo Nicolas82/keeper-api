@@ -1,9 +1,4 @@
-/* eslint-disable no-console */
-import { MoonIcon } from "@chakra-ui/icons";
-import { onMessage } from "webext-bridge";
 import browser, { Runtime } from "webextension-polyfill";
-
-//import LocalMessageDuplexStream from 'post-message-stream';
 
 /**
  * Regarde si le type du document est valide 
@@ -40,7 +35,7 @@ function documentElementCheck() : Boolean{
 
 /**
  * Détermine si l'api doit être injecté
- * @returns 
+ * @returns {boolean} vrai si la page doit être injecté, faux dans le cas échant
  */
 function shouldInject() {
   return doctypeCheck() && suffisCheck() && documentElementCheck(); 
@@ -52,17 +47,18 @@ function shouldInject() {
  */
 function injectScript() {
 
-  console.log("injection ....");
-
   try{
 
     const container = document.head || document.documentElement;
     const scriptTag = document.createElement('script');
 
+    //On ajoute le script à injecté dans la page courante
     scriptTag.setAttribute('async', 'false');
     scriptTag.src = browser.runtime.getURL('dist/inpage.js');
     container.insertBefore(scriptTag, container.children[0]);
 
+    //On supprime le script d'initialisation de la page courante dès qu'il 
+    // a fini de charger
     scriptTag.onload = () => {
       container.removeChild(scriptTag);
     }
@@ -74,37 +70,38 @@ function injectScript() {
 
 
 /**
- * Récupère la state publique du keeper
+ * Récupère la state publique du keeper si aucun compte n'est défini 
+ * c'est une erreur sera retourné et il faudra utiliser la fonction authSSI
+ * @param {Runtime.Port} background la connexion avec le background
  */
-function _getPublicState(){
+function _getPublicState(background: Runtime.Port){
 
-  var data = {
-    messageType: "publicState",
-    account: {
-      name : "foo",
-      publicKey: "bar",
-      address: "addr",
-      networkCode: "network byte",
+  background.postMessage(JSON.stringify({messageType: 'publicState'}));
+
+  // var data = {
+  //   messageType: "publicState",
+  //   account: {
+  //     name : "foo",
+  //     publicKey: "bar",
+  //     address: "addr",
+  //     networkCode: "network byte",
       
-    },
-    network : {
-      code: "W",
-      server: "https://testnet-nodes.wavesnode.com/"
-    }
-  }
-
-  const event = new CustomEvent("apiResponse", {detail: data});
-
-  window.dispatchEvent(event);
+  //   },
+  //   network : {
+  //     code: "W",
+  //     server: "https://testnet-nodes.wavesnode.com/"
+  //   }
+  // }
 
 }
 
 /**
  * Effectue une requête de connexion de type authSSI
+ * @param {Runtime.Port} background la connexion avec le background
  */
-function _useAuthSSI(background: Runtime.Port){
+function _useAuthSSI(background: Runtime.Port, data: Record<string, any>){
 
-  background.postMessage(JSON.stringify({messageType: 'authSSI'}));
+  background.postMessage(JSON.stringify({messageType: 'authSSI', url:data.url}));
 
 }
 
@@ -138,14 +135,14 @@ async function setupStreams() {
     switch(messageType){
 
       case "authSSI":
-        _useAuthSSI(port_background);
+        _useAuthSSI(port_background, data);
         break;
 
       case "publicState":
-        _getPublicState();
+        _getPublicState(port_background);
         break;
 
-      case "transaction":
+      case "signAndPublishTransaction":
         _processTransaction(data, port_background);
         break;
     }
@@ -154,6 +151,8 @@ async function setupStreams() {
 
   //Dès qu'on reçoit un message du background on le redirige
   port_background.onMessage.addListener(( data ) => {
+    
+    console.log(data);
 
     const event = new CustomEvent("apiResponse", {detail: data});
 
@@ -167,7 +166,7 @@ async function setupStreams() {
 (() => {
 
   //Injection du script dans la page courante
-  if(/*shouldInject()*/true){
+  if(shouldInject()){
     injectScript();
     setupStreams();
   }
