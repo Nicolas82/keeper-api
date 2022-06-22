@@ -103,27 +103,31 @@ async function Useapi(data: any) {
     case 'signAndPublishTransaction':
       var txData = data.txData;
       var seed:string = getSeed();
-      txData.data.chainId = getState().network.chainId;
+      
       var tx;
       console.log(txData.data);
       switch (txData.type) {
         //Issue transaction
         case 3:
+          txData.data.chainId = getState().network.chainId;
           tx = apsio.issue(txData.data, seed);
           break;
         //Transfer transaction
         case 4:
+          txData.data.chainId = getState().network.chainId;
           tx = apsio.transfer(txData.data, seed);
           break;
         //Data transaction
         case 12:
-          tx = apsio.data({data: txData.data, chainId:txData.chainId}, seed);
+          tx = apsio.data({data: txData.data, chainId:getState().network.chainId}, seed);
           break;
         //Invoke script transaction
         case 16:
+          txData.data.chainId = getState().network.chainId;
           tx = apsio.invokeScript(txData.data, seed);
           break;
         default:
+          txData.data.chainId = getState().network.chainId;
           tx = apsio.signTx(txData.data, seed);
       }
       try{
