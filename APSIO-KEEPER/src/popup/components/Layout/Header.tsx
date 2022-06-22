@@ -43,7 +43,7 @@ export function Header() {
                 func: 'removeSeed',
                 params: {}
               }));
-              //setPasswd(null);
+              setPasswd(null);
               goTo(Login);
             }}
             icon={ <Image

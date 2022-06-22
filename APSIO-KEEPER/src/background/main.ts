@@ -218,7 +218,7 @@ function connected(connection: Runtime.Port) {
       break;
     
     //Connexion avec le header de la page
-    case 'apsioheader': 
+    case 'apsiokeeper_header': 
       connection.onMessage.addListener( (message) => {
         var mess = JSON.parse(message);
         popupApi(mess.func, mess.params);
