@@ -102,7 +102,7 @@ async function Useapi(data: any) {
 
     case 'signAndPublishTransaction':
       var txData = data.txData;
-      var seed:string = /*walletController.getSeed();*/ "agree end glass enforce whisper measure clip table file pear daring undo tool leaf own";
+      var seed:string = getSeed();
       var tx;
       console.log(txData.data);
       switch (txData.type) {
