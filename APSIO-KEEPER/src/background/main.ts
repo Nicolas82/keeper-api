@@ -68,8 +68,8 @@ async function setState(chaindId:string){
  * Remove the current state if there is any
  */
 async function removeSeed(){ 
-  delete (window as Record<string, any>).state;
-  delete (window as Record<string, any>).seed;
+  (window as Record<string, any>).state = undefined;
+  (window as Record<string, any>).seed = undefined;
 }
 
 /**

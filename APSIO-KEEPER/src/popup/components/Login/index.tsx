@@ -132,7 +132,7 @@ export function Login() {
     var backgroundData = {
       func: 'saveSeed',
       params: {
-        seed: seed,
+        seed: decrypted,
         network : net
       }
     }
