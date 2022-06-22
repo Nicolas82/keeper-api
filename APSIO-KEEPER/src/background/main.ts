@@ -59,7 +59,7 @@ async function setState(chaindId:string){
       },
       network: {
         server: api.API_URL,
-        chaindId: chaindId
+        chainId: chaindId
       }
   }; 
 }
@@ -103,6 +103,7 @@ async function Useapi(data: any) {
     case 'signAndPublishTransaction':
       var txData = data.txData;
       var seed:string = getSeed();
+      txData.data.chainId = getState().network.chainId;
       var tx;
       console.log(txData.data);
       switch (txData.type) {
